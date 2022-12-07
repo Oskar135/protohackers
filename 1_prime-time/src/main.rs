@@ -30,8 +30,6 @@ impl Message {
         }
         for i in  2..self.number {
             if self.number % i ==0 {
-                let res = self.number % i; 
-                println!("{res}"); 
                 return false; 
             }
         }
@@ -83,10 +81,16 @@ async fn handle_connection(socket: &mut TcpStream){
                     buf.clear();
 
                 }
+                else{
+                    println!("Msg is not OK!"); 
+                    writer.write_all(b"malformed \n").await.unwrap(); 
+                    break; 
+                }
             },
             _ => {println!("Error while reading from socket!")} 
         }
     }
-    return; 
+    socket.shutdown().await.unwrap();    
+    println!("After while loop!"); 
 
 }
