@@ -86,7 +86,6 @@ async fn handle_connection(socket: &mut TcpStream){
             },
             _ => {println!("Error while reading from socket!")} 
         }
-        //TODO : make vec response and add b\n'
     }
     return; 
 
