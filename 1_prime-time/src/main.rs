@@ -9,11 +9,17 @@ struct Response {
     method: &'static str,
     prime: bool
 }
+impl Response    {
+
+    fn get_variables(&self){
+        println!("Method is: {0}, Prime: {1} ", self.method, self.prime);
+    }
+}
 
 #[derive(Deserialize, Debug)]
 struct Message {
     method: String,
-    number: i64
+    number: f64
 }
 
 impl Message {
@@ -25,15 +31,18 @@ impl Message {
     }
 
     fn is_prime(&self) -> bool {
-        if self.number <= 1{
+        if self.number <=1.0 || self.number.fract()!=0.0 {
             return false; 
         }
-        for i in  2..self.number {
-            if self.number % i ==0 {
-                return false; 
-            }
+
+        let num = self.number as u64; 
+
+        let panics=  std::panic::catch_unwind(||slow_primes::is_prime_miller_rabin(num)).is_err();
+        if panics{
+            return false; 
         }
-        return true; 
+
+        return slow_primes::is_prime_miller_rabin(num); 
     }
 
     fn get_variables(&self){
@@ -63,18 +72,19 @@ async fn handle_connection(socket: &mut TcpStream){
     let (reader, mut writer) = socket.split(); 
     let mut reader = BufReader::new(reader); 
     let mut buf = String::new(); 
-    
+
     while reader.read_line(&mut buf).await.expect("Failed to read line from socket!")!=0 {
         let mut m = serde_json::Deserializer::from_str(&buf); 
-        let msg= Message::deserialize(&mut m); 
+        let msg= Message::deserialize(&mut m);
+
         match msg {
             Ok(msg) =>{
-                msg.get_variables(); 
                 if msg.is_ok(){
                     let resp = Response {
                         method: "isPrime",
                         prime: msg.is_prime()
                     }; 
+
                     let mut resp = serde_json::to_vec(&resp).expect("Failed to serialize response!"); 
                     resp.push(b'\n');
                     writer.write_all(&resp).await.expect("Failed to respond!"); 
@@ -87,10 +97,12 @@ async fn handle_connection(socket: &mut TcpStream){
                     break; 
                 }
             },
-            _ => {println!("Error while reading from socket!")} 
+            _  => {
+                println!("Error while reading from socket!"); 
+                break; 
+            } 
         }
     }
     socket.shutdown().await.unwrap();    
-    println!("After while loop!"); 
 
 }

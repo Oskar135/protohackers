@@ -9,3 +9,6 @@ edition = "2021"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
+
+[dependencies.slow_primes]
+git = "https://github.com/huonw/slow_primes"
