@@ -58,24 +58,6 @@ async fn main() -> tokio::io::Result<()> {
         }); 
 
     }
-   // 
-   // let addr= "192.168.0.9:5006"; 
-   // let listener= TcpListener::bind(addr)?; 
-   // for stream in listener.incoming(){
-   //     let mut stream = stream?; 
-   //     let _ :thread::JoinHandle<Result<()>> = thread::spawn(move || {
-   //         loop {
-   //             let reader = BufReader::new(stream);
-   //             for rad in reader.lines(){
-   //                 let rad =rad?;
-   //                 let mut m = serde_json::Deserializer::from_str(&rad);
-   //                 let msg = Message::deserialize(&mut m)?;
-   //             }
-
-   //         }
-   //     });
-   // }
-   // Ok(())
 }
 
 async fn handle_connection(socket: &mut TcpStream){       
